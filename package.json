@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "tar-stream": "^1.6.2",
     "zstd-codec": "^0.1.1"
   }
 }
