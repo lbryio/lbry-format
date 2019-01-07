@@ -33,6 +33,8 @@ The LBRY format is a multimedia-format designed to promote interoperability and 
 
 ## Usage
 
+**WARNING:** These method signatures will change as the `JSON` `Descriptor` is finalized.
+
 Install `npm i https://github.com/lbryio/lbry-format.git`
 
 ### Pack
