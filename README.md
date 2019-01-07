@@ -30,3 +30,29 @@ The LBRY format is a multimedia-format designed to promote interoperability and 
 ## Requirements
 
  - Node.js v11.6.0 (see https://nodejs.org/docs/v11.6.0/api/esm.html)
+
+## Usage
+
+Install `npm i https://github.com/lbryio/lbry-format.git`
+
+### Pack
+```
+const lbryFormat = require('lbry-format');
+
+// Pack `./` to `package.lbry`
+lbryFormat.packDirectory('./', {
+  fileName: 'package.lbry',
+});
+
+```
+
+### Unpack
+```
+const lbryFormat = require('lbry-format');
+
+// Unpack `package.lbry` to `./`
+lbryFormat.unpackDirectory('./', {
+  fileName: 'package.lbry',
+});
+
+```
