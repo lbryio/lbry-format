@@ -5,7 +5,7 @@ const tarPack = tar.pack();
 const ZstdCodec = require('zstd-codec').ZstdCodec;
 const util = require('util');
 
-const COMPRESSION_LEVEL = 5;
+const COMPRESSION_LEVEL = 3;
 
 // async readdir
 const readdir = async (path, options) => {
@@ -64,29 +64,35 @@ async function walkAndRun(runCommand, dir, root) {
     const currentPath = path.join(dir, file);
 
     if (fs.statSync(currentPath).isDirectory()) {
-      walkAndRun(runCommand, currentPath);
+      await walkAndRun(runCommand, currentPath);
     } else {
-      runCommand(currentPath);
+      await runCommand(currentPath);
     }
   }
 };
 
+async function writeStream(stream, data) {
+  return new Promise((resolve) => {
+    stream.write(data);
+    stream.end(resolve)
+  });
+}
+
 async function packDirectory(directory, options = {}) {
+  const zstd = await getZstd();
   const packRoot = directory;
   const fileWriteStream = getFileWriteStream(options);
-  const zstd = await getZstd();
 
   tarPack.pipe(fileWriteStream);
-  writeFirstEntry(options, tarPack);
+  //writeFirstEntry(options, tarPack);
 
-  walkAndRun(async (file) => {
-    let contents = await readFile(file);
-
-    contents = new Uint8Array(contents);
+  await walkAndRun(async (file) => {
+    try{
+    contents = await readFile(path.normalize(file));
 
     // Must be chunked to avoid issues with fixed memory limits.
     const chunkIterator = (() => {
-      const chunkSize = 4096;
+      const chunkSize = 128;
       let position = 0;
 
       const iterator = {
@@ -119,9 +125,33 @@ async function packDirectory(directory, options = {}) {
       }
     });
 
-    entry.end(contents);
+    await writeStream(entry, contents);
+    //console.log(contents)
+    entry.end();
+  }catch (e){console.log(e)}
   }, directory, packRoot);
+  tarPack.finalize();
 };
+
+
+function strToBuffer (string) {
+  let arrayBuffer = new ArrayBuffer(string.length * 1);
+  let newUint = new Uint8Array(arrayBuffer);
+  newUint.forEach((_, i) => {
+    newUint[i] = string.charCodeAt(i);
+  });
+  return newUint;
+}
+
+function streamToBuffer(stream) {
+  const chunks = []
+  return new Promise((resolve, reject) => {
+    stream.on('data', chunk => chunks.push(chunk))
+    stream.on('error', reject)
+    stream.on('end', () => resolve(Buffer.concat(chunks)))
+  })
+}
+
 
 async function unpackDirectory(directory, options = {}) {
   if(!fs.existsSync(directory)) {
@@ -134,18 +164,21 @@ async function unpackDirectory(directory, options = {}) {
   const extract = tar.extract();
 
   extract.on('entry', async (header, fileStream, next) => {
-    fileStream.on('end', () => {
-      next();
-    })
+    let contents = await streamToBuffer(fileStream);
+    contents = new Uint8Array(contents);
+
+    contents = zstd.decompress(contents);
 
     if(!/^\./.test(header.name)) {
+      console.log(header.name)
       const writePath = path.join(directory, header.name);
-      await fs.promises.mkdir(path.dirname(writePath), { recursive: true });
+      fs.promises.mkdir(path.dirname(writePath), { recursive: true });
       var fileWriteStream = fs.createWriteStream(writePath);
-      fileStream.pipe(fileWriteStream);
+      fileWriteStream.end(contents);
+      next();
     } else {
-      // Just drain it
-      fileStream.resume();
+      fileWriteStream.resume();
+      next();
     }
   });
 
