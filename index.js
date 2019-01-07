@@ -5,7 +5,7 @@ const tarPack = tar.pack();
 const ZstdCodec = require('zstd-codec').ZstdCodec;
 const util = require('util');
 
-const COMPRESSION_LEVEL = 3;
+const COMPRESSION_LEVEL = 5;
 
 // async readdir
 const readdir = async (path, options) => {
@@ -84,7 +84,7 @@ async function packDirectory(directory, options = {}) {
   const fileWriteStream = getFileWriteStream(options);
 
   tarPack.pipe(fileWriteStream);
-  //writeFirstEntry(options, tarPack);
+  writeFirstEntry(options, tarPack);
 
   await walkAndRun(async (file) => {
     try{
@@ -92,7 +92,7 @@ async function packDirectory(directory, options = {}) {
 
     // Must be chunked to avoid issues with fixed memory limits.
     const chunkIterator = (() => {
-      const chunkSize = 128;
+      const chunkSize = 2048;
       let position = 0;
 
       const iterator = {
@@ -100,7 +100,7 @@ async function packDirectory(directory, options = {}) {
           const endIndex = position + chunkSize;
           const result = {
             value: contents.slice(position, endIndex),
-            done: endIndex >= contents.length,
+            done: position >= contents.length,
           };
 
           position = endIndex;
@@ -170,14 +170,17 @@ async function unpackDirectory(directory, options = {}) {
     contents = zstd.decompress(contents);
 
     if(!/^\./.test(header.name)) {
-      console.log(header.name)
+      if(header.name == 'index.html') {
+        console.log(String.fromCharCode.apply(null, contents))
+      }
       const writePath = path.join(directory, header.name);
       fs.promises.mkdir(path.dirname(writePath), { recursive: true });
       var fileWriteStream = fs.createWriteStream(writePath);
-      fileWriteStream.end(contents);
+      fileWriteStream.write(contents);
+      fileWriteStream.end();
       next();
     } else {
-      fileWriteStream.resume();
+      fileStream.resume();
       next();
     }
   });
