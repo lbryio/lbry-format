@@ -173,15 +173,12 @@ async function unpackDirectory(directory, options = {}) {
       if(!/^\./.test(header.name)) {
         const writePath = path.join(directory, header.name);
 
-        var fileWriteStream;
         try {
-          fileWriteStream = fs.createWriteStream(writePath);
-        } catch (e) {
-          // Assume directory may not exist if an error is thrown
           fs.mkdirSync(path.dirname(writePath), { recursive: true });
-          fileWriteStream = fs.createWriteStream(writePath);
+        } catch (e) {
+          // Directory exists
         }
-
+        const fileWriteStream = fs.createWriteStream(writePath);
         fileWriteStream.write(contents);
         fileWriteStream.end();
         next();
