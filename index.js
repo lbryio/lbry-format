@@ -87,7 +87,6 @@ async function packDirectory(directory, options = {}) {
   writeFirstEntry(options, tarPack);
 
   await walkAndRun(async (file) => {
-    try{
     contents = await readFile(path.normalize(file));
 
     // Must be chunked to avoid issues with fixed memory limits.
@@ -113,7 +112,7 @@ async function packDirectory(directory, options = {}) {
 
     contents = zstd.compressChunks(chunkIterator, contents.length, COMPRESSION_LEVEL);
 
-    let name = path.relative(packRoot, file);
+    let name = path.relative(packRoot, file).replace('\\', '/');
 
     if(/^\.\//.test(name)) {
       name = name.slice(2);
@@ -128,7 +127,6 @@ async function packDirectory(directory, options = {}) {
     await writeStream(entry, contents);
 
     entry.end();
-  }catch (e){console.log(e)}
   }, directory, packRoot);
   tarPack.finalize();
 };
