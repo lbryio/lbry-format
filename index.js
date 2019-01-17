@@ -166,7 +166,28 @@ async function unpackDirectory(directory, options = {}) {
       let contents = await streamToBuffer(fileStream);
       contents = new Uint8Array(contents);
 
-      contents = zstd.decompress(contents);
+      // Must be chunked to avoid issues with fixed memory limits.
+      const chunkIterator = (() => {
+        const chunkSize = 2048;
+        let position = 0;
+
+        const iterator = {
+          next: function() {
+            const endIndex = position + chunkSize;
+            const result = {
+              value: contents.slice(position, endIndex),
+              done: position >= contents.length,
+            };
+
+            position = endIndex;
+            return result;
+          },
+          [Symbol.iterator]: function() { return this }
+        };
+        return iterator;
+      })();
+
+      contents = zstd.decompressChunks(chunkIterator);
 
       if(!/^\./.test(header.name)) {
         const writePath = path.join(directory, header.name);
