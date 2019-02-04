@@ -7,6 +7,17 @@ const util = require('util');
 
 const COMPRESSION_LEVEL = 5;
 
+function mkdirSyncRecursive(dir) {
+  let path = dir.replace(/\/$/, '').split('/');
+
+  for (var i = 1; i <= path.length; i++) {
+    let segment = path.slice(0, i).join('/');
+    if (segment.length > 0 && !fs.existsSync(segment)) {
+      fs.mkdirSync(segment)
+    }
+  }
+}
+
 // async readdir
 const readdir = async (path, options) => {
   return new Promise((resolve) => {
@@ -154,7 +165,7 @@ function streamToBuffer(stream) {
 async function unpackDirectory(directory, options = {}) {
   return new Promise(async (resolve) => {
     if(!fs.existsSync(directory)) {
-      fs.mkdirSync(directory);
+      mkdirSyncRecursive(directory);
     }
 
     const fileReadStream = getFileReadStream(options);
@@ -193,7 +204,7 @@ async function unpackDirectory(directory, options = {}) {
         const writePath = path.join(directory, header.name);
 
         try {
-          fs.mkdirSync(path.dirname(writePath), { recursive: true });
+          mkdirSyncRecursive(path.dirname(writePath));
         } catch (e) {
           // Directory exists
         }
