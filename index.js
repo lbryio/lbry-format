@@ -8,12 +8,12 @@ const util = require('util');
 const COMPRESSION_LEVEL = 5;
 
 function mkdirSyncRecursive(dir) {
-  let path = dir.replace(/\/$/, '').split('/');
+  let segments = dir.split(path.sep);
 
-  for (var i = 1; i <= path.length; i++) {
-    let segment = path.slice(0, i).join('/');
+  for (let i = 1; i <= segments.length; i++) {
+    let segment = segments.slice(0, i).join('/');
     if (segment.length > 0 && !fs.existsSync(segment)) {
-      fs.mkdirSync(segment)
+      fs.mkdirSync(segment);
     }
   }
 }
@@ -206,6 +206,7 @@ async function unpackDirectory(directory, options = {}) {
         try {
           mkdirSyncRecursive(path.dirname(writePath));
         } catch (e) {
+          console.log(e);
           // Directory exists
         }
         const fileWriteStream = fs.createWriteStream(writePath);
