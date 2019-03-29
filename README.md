@@ -1,8 +1,17 @@
-**PROPOSAL STAGE**
-
 # LBRY File Format
 
-The LBRY format is a multimedia-format designed to promote interoperability and transmission of complex digital media.
+The LBRY format is a multimedia-format designed to promote interoperability and transmission of complex digital media.  
+  
+This repo contains some tools & libraries for working with `*.lbry` files.
+
+## CLI Installation
+
+Requires: [NodeJS](https://nodejs.org/en/download/), [Git](https://git-scm.com/downloads)
+
+Windows: `npm i -g https://github.com/lbryio/lbry-format`  
+Mac / Linux: `sudo npm i -g https://github.com/lbryio/lbry-format`
+
+Once installed, run `lbry-format --help`
 
 ## Name
 
