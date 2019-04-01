@@ -13,6 +13,10 @@ Mac / Linux: `sudo npm i -g https://github.com/lbryio/lbry-format`
 
 Once installed, run `lbry-format --help`
 
+## CLI Usage
+
+`lbry-format pack ./sourceDirectory ./outputPackage.lbry`
+
 ## Name
 
  - Name Format: `*.lbry`
