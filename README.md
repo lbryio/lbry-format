@@ -17,6 +17,17 @@ Once installed, run `lbry-format --help`
 
 `lbry-format pack ./sourceDirectory ./outputPackage.lbry`
 
+## What It's For
+A lbry-format file is a compressed web site, much like a zip file.  More specifically, it's a directory of files individually zipped with Zstandard, then collected into a tar archive. 
+
+It is recognized and launched by the LBRY-desktop app to enable rich, interactive media in the client.
+
+When the LBRY desktop app encounters the .lbry extension, and the user presses "play," it decompresses the .lbry file, launches a sandboxed web server in the background, and 'serves up' this file like a real web server might.
+
+This enables a lot of possibilities. To see what is currently possible with this format, check out the LBRY channel [@OpenSourceGames](https://open.lbry.io/@OpenSourceGames#e8fed337dc4ee260f4bcfa6d24ae1e4dd75c2fb3).
+
+There are more restrictions to a .lbry archive than normal websites, because of the security issues and the fact that it's not running on a domain.
+
 ## Name
 
  - Name Format: `*.lbry`
