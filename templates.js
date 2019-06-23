@@ -5,7 +5,7 @@ module.exports = {
         type: "static",
         name: "index.html",
         contents:
-          '<!doctype html><title>Gallary Slideshow</title><meta name=viewport content="width=device-width,initial-scale=1" charset=utf-8><link rel=stylesheet href=index.css><script src=files.js charset=utf-8></script><div id=container class=slideshow-container><a class=prev onclick=plusSlides(-1)>&#10094;</a> <a class=next onclick=plusSlides(1)>&#10095;</a></div><script src=index.js charset=utf-8></script>'
+          '<!doctype html><title>Gallery Slideshow</title><meta name=viewport content="width=device-width,initial-scale=1" charset=utf-8><link rel=stylesheet href=index.css><script src=files.js charset=utf-8></script><div id=container class=slideshow-container><a class=prev onclick=plusSlides(-1)>&#10094;</a> <a class=next onclick=plusSlides(1)>&#10095;</a></div><script src=index.js charset=utf-8></script>'
       },
       {
         type: "static",
@@ -20,6 +20,6 @@ module.exports = {
           'const container=document.getElementById("container");for(let e=0;e<images.length;e++){const n=document.createElement("img");n.className="mySlides fade",n.src=images[e],container.appendChild(n)}let slideIndex=1;function plusSlides(e){showSlides(slideIndex+=e)}function showSlides(e){const n=document.getElementsByClassName("mySlides");e>n.length&&(slideIndex=1),e<1&&(slideIndex=n.length);for(let e=0;e<n.length;e++)n[e].style.display="none";n[slideIndex-1].style.display="block"}showSlides(slideIndex);'
       }
     ],
-    title: "Gallary Slideshow"
+    title: "Gallery Slideshow"
   }
 };
