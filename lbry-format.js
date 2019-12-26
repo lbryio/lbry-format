@@ -3,7 +3,7 @@ const { packDirectory, unpackDirectory } = require("lbry-format");
 const path = require("path");
 
 require("yargs")
-  .scriptName("lbry-pack")
+  .scriptName("lbry-format")
   .usage("$0 <cmd> [args]")
   .command(
     "pack [directory] [file] [-t]",
